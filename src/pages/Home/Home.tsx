@@ -23,7 +23,7 @@ const Home = () => {
 
 
   return (
-    <main className="pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <main className="pb-20 mt-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
       {/* Hero Section */}
 <div className="text-center mb-16 text-white italic">
   <h1 className="text-5xl  md:text-7xl lg:text-8xl xl:text-9xl font-extrabold italic leading-7 sm:leading-8 md:leading-10 lg:leading-14 xl:leading-18 mb-0">

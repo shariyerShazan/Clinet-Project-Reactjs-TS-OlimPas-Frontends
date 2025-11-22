@@ -16,7 +16,7 @@ interface FormData {
   cardholderName: string
   cardNumber: string
   expireDate: string
-  cvc: number
+  cvc: string
   paymentMethod: string
   validity: string
 }

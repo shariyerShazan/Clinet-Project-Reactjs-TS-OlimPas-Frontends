@@ -3,6 +3,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { GoDownload } from "react-icons/go";
 import successPic from "@/assets/payment/dialog/success.png"
+import { useNavigate } from "react-router";
 
 
 interface PaymentSuccessProps {
@@ -12,6 +13,7 @@ interface PaymentSuccessProps {
 }
 
 const PaymentSuccess: React.FC<PaymentSuccessProps> = ({ open, onClose, membershipId }) => {
+  const navigate = useNavigate()
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="border-0 bg-white rounded-2xl shadow-2xl max-w-md italic">
@@ -70,7 +72,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({ open, onClose, membersh
             <Button className="w-full bg-[#e1e1e1] text-black hover:bg-gray-200 cursor-pointer rounded-full font-semibold">
               Download as PDF <GoDownload size={22}/>
             </Button>
-            <Button className="w-full bg-[#F80B58] text-white hover:bg-pink-500 cursor-pointer rounded-full font-semibold">
+            <Button onClick={()=> navigate("/redeem")} className="w-full bg-[#F80B58] text-white hover:bg-pink-500 cursor-pointer rounded-full font-semibold">
               Redeem First Discount
             </Button>
           </div>
