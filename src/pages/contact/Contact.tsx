@@ -8,7 +8,7 @@ const Contact = () => {
     }, [])
     
 
-    const textClass = "text-white text-4xl leading-8 sm:text-5xl sm:leading-10 md:text-6xl md:leading-12   !tracking-[1px] lg:text-7xl xl:text-8xl lg:leading-14 xl:leading-20 uppercase text-center font-extrabold italic  tracking-tighter"
+    const textClass = "text-white text-4xl leading-8 sm:text-5xl sm:leading-10 md:text-6xl md:leading-12   !tracking-[-2px] lg:text-7xl xl:text-8xl lg:leading-14 xl:leading-20 uppercase text-center font-extrabold italic  tracking-tighter"
   return (
     <div className="mt-26 flex flex-col items-center justify-center min-h-[50vh]">
         <p className={`${textClass} font-abc-ultra bold-stroke-3 `} >For more information</p>
