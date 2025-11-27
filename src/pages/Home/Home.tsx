@@ -25,7 +25,7 @@ const Home = () => {
     },
   ];
 
-
+// 
   return (
     <main className="pb-20 mt-14 px-4 flex flex-col justify-between min-h-[78vh] sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
       {/* Hero Section */}
