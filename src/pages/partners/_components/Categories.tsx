@@ -8,6 +8,18 @@ const Categories = ({partnerCategories} : {partnerCategories : Category[]}) => {
           {partnerCategories.map((category, index: number) => (
             <div key={index} className="text-center">
               {/* Category Name */}
+              {/* <div  
+                  className={`inline-block border !border-[${category.color}] border-2 rounded-full px-9.5 py-2 mb-6`}
+                  style={{ borderColor: category.color }}
+               >
+                <p 
+                  style={{ color: category.color }}
+                  className={`text-[${category.color}]  italic  text-base md:text-lg lg:text-xl  xl:text-2xl`}
+                >
+                {category.name}
+                </p>
+              </div> */}
+
               <div  
                   className={`inline-block border !border-[${category.color}] border-2 rounded-full px-9.5 py-2 mb-6`}
                   style={{ borderColor: category.color }}
