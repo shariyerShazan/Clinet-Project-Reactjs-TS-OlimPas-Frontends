@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import type { Category } from "@/pages/partners/Partners";
+
 import { BASE_URL } from "@/lib/baseUrl";
+import type { Category } from "./useGetCategories";
 
 
 interface UseGetSingleCategoryReturn {
