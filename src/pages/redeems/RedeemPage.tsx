@@ -109,7 +109,7 @@ const handleRedeem = async () => {
             <Input
               value={membershipId}
               onChange={(e) => setMembershipId(e.target.value)}
-              placeholder="Enter your 5 digit id"
+              placeholder="Enter your 6 digit id"
               className="!bg-[#2b2b2b] border-0 focus:!ring-1 focus:!ring-[#F80B58] text-white placeholder-gray-600"
             />
           </div>

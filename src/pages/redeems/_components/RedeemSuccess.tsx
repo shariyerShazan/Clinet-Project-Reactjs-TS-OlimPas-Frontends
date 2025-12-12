@@ -45,60 +45,77 @@ const RedeemSuccess: React.FC<RedeemSuccessProps> = ({ open, onClose, redeemedId
 const handleDownloadPDF = () => {
   if (!redeemData) return;
 
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
   import("jspdf").then((jsPDFModule) => {
     const { jsPDF } = jsPDFModule;
     const doc = new jsPDF();
 
-    // Colors
     const primaryColor = "#F80B58"; // Pinkish
-    const secondaryColor = "#333333"; // Dark gray for text
+    const secondaryColor = "#333333"; // Dark gray text
+    const boxColor = "#f8f8f8"; // Light gray boxes
 
-    // Title Box
+    // Title
     doc.setFillColor(primaryColor);
-    doc.rect(0, 0, 210, 30, "F"); // Full width header
+    doc.rect(0, 0, 210, 30, "F");
     doc.setTextColor("#ffffff");
     doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
     doc.text("OLIM PASS MEMBERSHIP", 105, 20, { align: "center" });
 
-    // Draw a divider line
+    // Divider
     doc.setDrawColor(primaryColor);
     doc.setLineWidth(0.8);
     doc.line(20, 35, 190, 35);
 
-    // Body
-    doc.setTextColor(secondaryColor);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-
     let startY = 45;
     const lineHeight = 10;
 
-    doc.text(`Membership ID: ${redeemData.registration.membershipId}`, 20, startY);
-    startY += lineHeight;
-    doc.text(`Name: ${redeemData.registration.firstName} ${redeemData.registration.lastName}`, 20, startY);
-    startY += lineHeight;
-    doc.text(`Email: ${redeemData.registration.email}`, 20, startY);
-    startY += lineHeight;
-    doc.text(`Phone: ${redeemData.registration.phone}`, 20, startY);
-    startY += lineHeight;
-    doc.text(`Teudat Zehut: ${redeemData.registration.teudatZehut}`, 20, startY);
-    startY += lineHeight;
-    doc.text(`Aliyah Date: ${redeemData.registration.aliyahDate}`, 20, startY);
-    startY += lineHeight * 2;
-
-    // Partner Info Box
-    doc.setFillColor("#f8f8f8");
-    doc.roundedRect(15, startY, 180, 50, 5, 5, "F");
+    // ===== Partner Section =====
+    doc.setFillColor(boxColor);
+    doc.roundedRect(15, startY, 180, 60, 5, 5, "F");
     doc.setTextColor(secondaryColor);
-    let partnerY = startY + 15;
-    doc.text(`Partner: ${redeemData.partner.name}`, 20, partnerY);
-    // partnerY += lineHeight;
-    // doc.text(`Category: ${redeemData.partner.category.name}`, 20, partnerY);
-    partnerY += lineHeight;
-    doc.text(`Discount: ${redeemData.partner.discount}`, 20, partnerY);
-    partnerY += lineHeight;
-    doc.text(`Redeemed At: ${new Date(redeemData.redeemedAt.slice(0, 10)).toLocaleString()}`, 20, partnerY);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text(`Partner: ${redeemData.partner.name}`, 20, startY + 15);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`Discount: ${redeemData.partner.discount}`, 20, startY + 25);
+    const redeemedAt = new Date(redeemData.redeemedAt);
+    doc.text(`Redeemed At: ${redeemedAt.toLocaleString("en-US", options)}`, 20, startY + 35);
+
+    startY += 70; // Move below partner box
+
+    // ===== Member Section =====
+    doc.setFillColor(boxColor);
+    doc.roundedRect(15, startY, 180, 90, 5, 5, "F");
+    doc.setTextColor(secondaryColor);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Member Information", 105, startY + 10, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+
+    let memberY = startY + 25;
+    doc.text(`Membership ID: ${redeemData.registration.membershipId}`, 20, memberY);
+    memberY += lineHeight;
+    doc.text(`Name: ${redeemData.registration.firstName} ${redeemData.registration.lastName}`, 20, memberY);
+    memberY += lineHeight;
+    doc.text(`Email: ${redeemData.registration.email}`, 20, memberY);
+    memberY += lineHeight;
+    doc.text(`Phone: ${redeemData.registration.phone}`, 20, memberY);
+    memberY += lineHeight;
+    doc.text(`Teudat Zehut: ${redeemData.registration.teudatZehut}`, 20, memberY);
+    memberY += lineHeight;
+    const aliyahDate = new Date(redeemData.registration.aliyahDate);
+    doc.text(`Aliyah Date: ${aliyahDate.toLocaleString("en-US", options)}`, 20, memberY);
 
     // Footer
     doc.setTextColor("#777777");
@@ -106,11 +123,10 @@ const handleDownloadPDF = () => {
     doc.text("Thank you for using OLIM PASS!", 105, 280, { align: "center" });
 
     // Save PDF
-    doc.save(
-      `Redeem_${redeemData.registration.membershipId}_${redeemData.partner.name}.pdf`
-    );
+    doc.save(`Redeem_${redeemData.registration.membershipId}_${redeemData.partner.name}.pdf`);
   });
 };
+
 
   if (!redeemData) return null;
 
@@ -140,7 +156,8 @@ const handleDownloadPDF = () => {
             </p>
           </div>
 
-          <button
+          <div className='flex flex-col gap-2'>
+            <button
             onClick={onClose}
             className="bg-[#F80B58] w-full py-2 rounded-full text-white font-semibold
                        hover:bg-[#F80B58CC] transition cursor-pointer"
@@ -153,6 +170,7 @@ const handleDownloadPDF = () => {
           >
             Download as PDF <GoDownload size={22} />
           </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
