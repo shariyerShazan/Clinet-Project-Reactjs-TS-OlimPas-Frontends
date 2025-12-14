@@ -115,7 +115,9 @@ const handleDownloadPDF = () => {
     doc.text(`Teudat Zehut: ${redeemData.registration.teudatZehut}`, 20, memberY);
     memberY += lineHeight;
     const aliyahDate = new Date(redeemData.registration.aliyahDate);
-    doc.text(`Aliyah Date: ${aliyahDate.toLocaleString("en-US", options)}`, 20, memberY);
+    doc.text(`Aliyah Date: ${aliyahDate.toLocaleString("en-US", {
+                year: 'numeric', month: 'long', day: 'numeric'
+              })}`, 20, memberY);
 
     // Footer
     doc.setTextColor("#777777");

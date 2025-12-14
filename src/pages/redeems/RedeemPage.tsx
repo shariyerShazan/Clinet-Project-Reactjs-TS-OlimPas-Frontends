@@ -115,7 +115,7 @@ const handleRedeem = async () => {
           </div>
              <button
                 onClick={handleSendOtp}
-                className="bg-[#F80B58] py-1.5 px-4 rounded-md cursor-pointer font-semibold hover:bg-[#F80B58CC] transition"
+                className="bg-[#F80B58] py-1.5 px-4 rounded-md cursor-pointer font-semibold hover:bg-[#F80B58CC] transition disabled:cursor-not-allowed"
                 disabled={sendingOtp}
               >
                 {sendingOtp ? "Sending..." : "Send OTP"}
@@ -189,7 +189,7 @@ const handleRedeem = async () => {
         {otpSent && (
           <button
               onClick={handleRedeem}
-              className="bg-[#F80B58] py-2 px-7 rounded-full font-semibold hover:bg-[#F80B58CC] transition cursor-pointer"
+              className="bg-[#F80B58] py-2 px-7 rounded-full font-semibold hover:bg-[#F80B58CC] transition cursor-pointer disabled:cursor-not-allowed"
               disabled={!selectedCategory || !selectedBusiness || !membershipId || !otp || redeeming}
             >
               {redeeming ? "Redeeming..." : "Redeem Discount"}
