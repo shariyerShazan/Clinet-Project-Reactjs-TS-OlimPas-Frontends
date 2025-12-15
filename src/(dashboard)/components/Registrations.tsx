@@ -1,9 +1,8 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import axios from "axios"
 import DSkeletonTable from "./SkeletonTable"
-
 
 interface Registration {
   id: string
@@ -52,9 +51,9 @@ export default function DRegistrations() {
   }
 
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-lg font-medium text-gray-900">Registrations</h2>
+    <div className="bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-700">
+        <h2 className="text-lg font-semibold text-white">Registrations</h2>
       </div>
 
       {loading ? (
@@ -62,60 +61,36 @@ export default function DRegistrations() {
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-[#121212]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Teudat Zehut
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Membership ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Valid Until
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Registered At
-                  </th>
+                  {["Name","Email","Phone","Teudat Zehut","Membership ID","Valid Until","Status","Registered At"].map((h) => (
+                    <th
+                      key={h}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-700">
                 {paginationData?.data.map((reg) => (
-                  <tr key={reg.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {reg.firstName} {reg.lastName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reg.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reg.phone}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reg.teudatZehut}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reg.membershipId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(reg.validTo).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          reg.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                        }`}
-                      >
+                  <tr key={reg.id} className="hover:bg-[#121212] transition-colors">
+                    <td className="px-6 py-4 text-sm text-white">{reg.firstName} {reg.lastName}</td>
+                    <td className="px-6 py-4 text-sm text-gray-400">{reg.email}</td>
+                    <td className="px-6 py-4 text-sm text-gray-400">{reg.phone}</td>
+                    <td className="px-6 py-4 text-sm text-gray-400">{reg.teudatZehut}</td>
+                    <td className="px-6 py-4 text-sm text-gray-400">{reg.membershipId}</td>
+                    <td className="px-6 py-4 text-sm text-gray-400">{new Date(reg.validTo).toLocaleDateString()}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        reg.isActive ? "bg-green-700 text-white" : "bg-red-700 text-white"
+                      }`}>
                         {reg.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(reg.createdAt).toLocaleDateString()}
-                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-400">{new Date(reg.createdAt).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -123,26 +98,26 @@ export default function DRegistrations() {
           </div>
 
           {/* Pagination */}
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div className="px-4 py-3 flex items-center justify-between border-t border-gray-700 sm:px-6">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                className="px-4 py-2 rounded-md text-sm font-medium bg-[#121212] text-gray-300 hover:bg-[#222] disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page === paginationData?.totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                className="px-4 py-2 rounded-md text-sm font-medium bg-[#121212] text-gray-300 hover:bg-[#222] disabled:opacity-50"
               >
                 Next
               </button>
             </div>
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-400">
                   Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{" "}
                   <span className="font-medium">{Math.min(page * limit, paginationData?.total || 0)}</span> of{" "}
                   <span className="font-medium">{paginationData?.total}</span> results
@@ -153,7 +128,7 @@ export default function DRegistrations() {
                   <button
                     onClick={() => setPage(page - 1)}
                     disabled={page === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    className="px-2 py-2 rounded-l-md bg-[#121212] text-gray-400 hover:bg-[#222] disabled:opacity-50"
                   >
                     Previous
                   </button>
@@ -161,10 +136,10 @@ export default function DRegistrations() {
                     <button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                      className={`px-4 py-2 border text-sm font-medium ${
                         pageNum === page
-                          ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
-                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          ? "z-10 bg-[#F80B58] border-[#F80B58] text-white"
+                          : "bg-[#121212] border-gray-700 text-gray-400 hover:bg-[#222]"
                       }`}
                     >
                       {pageNum}
@@ -173,7 +148,7 @@ export default function DRegistrations() {
                   <button
                     onClick={() => setPage(page + 1)}
                     disabled={page === paginationData?.totalPages}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    className="px-2 py-2 rounded-r-md bg-[#121212] text-gray-400 hover:bg-[#222] disabled:opacity-50"
                   >
                     Next
                   </button>

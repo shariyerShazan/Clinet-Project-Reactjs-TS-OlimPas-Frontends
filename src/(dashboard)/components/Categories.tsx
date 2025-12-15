@@ -1,9 +1,11 @@
-"use client"
 
-import type React from "react"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
+import { BASE_URL } from "@/lib/baseUrl"
+import DSkeletonTable from "./SkeletonTable"
+import Swal from "sweetalert2"
+// import withReactContent from "sweetalert2-react-content"
 
 interface Category {
   id: string
@@ -12,8 +14,10 @@ interface Category {
 }
 
 export default function DCategories() {
+  // const MySwal = withReactContent(Swal)
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [createLoading, setCreateLoading] = useState(false)
   const [name, setName] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
@@ -25,9 +29,7 @@ export default function DCategories() {
   const fetchCategories = async () => {
     try {
       setLoading(true)
-      const response = await axios.get("http://localhost:3000/category", {
-        withCredentials: true,
-      })
+      const response = await axios.get(`${BASE_URL}/categories`, { withCredentials: true })
       setCategories(response.data.data || [])
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to fetch categories")
@@ -37,40 +39,73 @@ export default function DCategories() {
   }
 
   const handleCreate = async (e: React.FormEvent) => {
+    setCreateLoading(true)
     e.preventDefault()
     setError("")
     setSuccess("")
 
     try {
-      await axios.post("http://localhost:3000/category", { name }, { withCredentials: true })
+      await axios.post(`${BASE_URL}/categories`, { name }, { withCredentials: true })
       setSuccess("Category created successfully")
       setName("")
       fetchCategories()
+      setCreateLoading(false)
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to create category")
+      setCreateLoading(false)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this category?")) return
+const handleDelete = async (id: string) => {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+    reverseButtons: true,
+    background: "#121212", // dark background
+    color: "#fff", // text color
+    confirmButtonColor: "#F80B58",
+    cancelButtonColor: "#888",
+  })
 
+  if (result.isConfirmed) {
     try {
-      await axios.delete(`http://localhost:3000/category/${id}`, {
-        withCredentials: true,
-      })
+      await axios.delete(`${BASE_URL}/categories/${id}`, { withCredentials: true })
       setSuccess("Category deleted successfully")
       fetchCategories()
+      Swal.fire({
+        title: "Deleted!",
+        text: "Category has been deleted.",
+        icon: "success",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#F80B58",
+      })
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to delete category")
+      Swal.fire({
+        title: "Error!",
+        text: err.response?.data?.message || "Failed to delete category",
+        icon: "error",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#F80B58",
+      })
     }
   }
+}
+
 
   return (
     <div className="space-y-6">
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Create Category</h2>
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-500 rounded text-sm">{error}</div>}
-        {success && <div className="mb-4 p-3 bg-green-50 text-green-500 rounded text-sm">{success}</div>}
+      {/* Create Category */}
+      <div className="bg-[#1a1a1a] shadow-md rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Create Category</h2>
+        {error && <div className="mb-4 p-3 bg-[#F80B58]/20 text-[#F80B58] rounded text-sm">{error}</div>}
+        {success && <div className="mb-4 p-3 bg-green-800 text-green-400 rounded text-sm">{success}</div>}
 
         <form onSubmit={handleCreate} className="flex gap-4">
           <input
@@ -79,42 +114,44 @@ export default function DCategories() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Category name"
             required
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="flex-1 px-3 py-2 bg-[#121212] border border-[#F80B58] rounded-md shadow-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#F80B58]"
           />
-          <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Create
+          <button
+            type="submit"
+            disabled={createLoading}
+            className="px-6 py-2 bg-[#F80B58] text-white rounded-md hover:bg-[#F80B5899] transition-colors duration-200 cursor-pointer disabled:cursor-not-allowed"
+          >
+           {createLoading ? "Creating..." : "Create"}
           </button>
         </form>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Categories</h2>
+      {/* Categories Table */}
+      <div className="bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-700">
+          <h2 className="text-lg font-semibold text-white">Categories</h2>
         </div>
         {loading ? (
-          <div className="p-6">Loading...</div>
+            <DSkeletonTable rows={8} columns={3} />
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead className="bg-[#121212]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Partners
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Partners</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-700">
               {categories.map((category) => (
-                <tr key={category.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{category.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {category.partners?.length || 0}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => handleDelete(category.id)} className="text-red-600 hover:text-red-900">
+                <tr key={category.id} className="hover:bg-[#121212] transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{category.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{category.partners?.length || 0}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                    <button
+                      onClick={() => handleDelete(category.id)}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                    >
                       Delete
                     </button>
                   </td>

@@ -12,6 +12,7 @@ import DashboradLayout from "@/layouts/DashboardLayout";
 import Login from "@/(dashboard)/auth/login/Login";
 import Dashboard from "@/(dashboard)/pages/dashboard";
 import Categories from "@/(dashboard)/components/Categories";
+import PrivateRoute from "./PrivateRoutes";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!)
 
 
@@ -48,11 +49,15 @@ export const Routes = createBrowserRouter([
     },
     {
                 path: "dashboard",
-                element: <DashboradLayout /> ,
+                element:
+
+                   <DashboradLayout />
+
+ ,
                 children: [
                     {
                         index: true,
-                        element: <Dashboard />
+                        element: <PrivateRoute > <Dashboard /> </PrivateRoute> 
                     },
                     {
                         path: "signup",

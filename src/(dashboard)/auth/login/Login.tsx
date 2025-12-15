@@ -19,7 +19,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const res = await axios.post(`${BASE_URL}/auth/login`, { email, password })
+      const res = await axios.post(`${BASE_URL}/auth/login`, { email, password } , { withCredentials: true })
       if (res.data.success) {
         localStorage.setItem("user", JSON.stringify(res.data.user))
         if(res.data.user.role === 'ADMIN'){
@@ -40,7 +40,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex items-center justify-center   px-4">
+    <div className="flex items-center justify-center min-h-[90vh]  px-4">
       <div className="max-w-md w-full bg-[#121212] p-10 rounded-2xl shadow-2xl border border-[#F80B58]/20">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white">Admin Login</h2>

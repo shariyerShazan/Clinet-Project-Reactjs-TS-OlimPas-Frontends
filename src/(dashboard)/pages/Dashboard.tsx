@@ -39,7 +39,7 @@ export default function Dashboard() {
       {/* Tabs */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="flex border-b border-gray-700">
+          <TabsList className="flex border-b border-gray-700 ">
             {[
               { value: "categories", label: "Categories" },
               { value: "partners", label: "Partners" },
@@ -49,7 +49,7 @@ export default function Dashboard() {
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className={`px-6 py-3 font-medium text-sm rounded-t-md transition-colors duration-200 ${
+                className={`px-6 py-3 font-medium text-sm rounded-t-md transition-colors duration-200 cursor-pointer ${
                   activeTab === tab.value
                     ? "bg-[#1f1f1f] border-b-2 border-[#F80B58] text-[#F80B58]"
                     : "text-gray-400 hover:text-white"

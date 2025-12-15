@@ -1,162 +1,191 @@
-
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import axios from "axios"
+import Swal from "sweetalert2"
+import { BASE_URL } from "@/lib/baseUrl"
 
-interface Category {
-  id: string
-  name: string
-}
+
 
 interface Partner {
   id: string
   name: string
   discount: string
-  category: Category
+  categoryId: string
+}
+
+interface Category {
+  id: string
+  name: string
+  partners: Partner[]
 }
 
 export default function DPartners() {
-  const [partners, setPartners] = useState<Partner[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
+  const [selectedCategoryId, setSelectedCategoryId] = useState("")
+    const [createLoading, setCreateLoading] = useState(false)
   const [name, setName] = useState("")
   const [discount, setDiscount] = useState("")
-  const [categoryId, setCategoryId] = useState("")
-  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
   const [success, setSuccess] = useState("")
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    fetchData()
+    fetchCategories()
   }, [])
 
-  const fetchData = async () => {
+  const fetchCategories = async () => {
     try {
       setLoading(true)
-      const [categoriesRes, partnersRes] = await Promise.all([
-        axios.get("http://localhost:3000/category", { withCredentials: true }),
-        axios.get("http://localhost:3000/partner", { withCredentials: true }),
-      ])
-      setCategories(categoriesRes.data.data || [])
-      setPartners(partnersRes.data.data || [])
+      const res = await axios.get(`${BASE_URL}/categories`, { withCredentials: true })
+      setCategories(res.data.data || [])
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to fetch data")
+      setError(err.response?.data?.message || "Failed to fetch categories")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreatePartner = async (e: React.FormEvent) => {
+    setCreateLoading(true)
     e.preventDefault()
-    setError("")
-    setSuccess("")
+    if (!selectedCategoryId) return setError("Please select a category")
+    setError(""); setSuccess("")
 
     try {
-      await axios.post("http://localhost:3000/partner", { name, discount, categoryId }, { withCredentials: true })
+      await axios.post(`${BASE_URL}/partners`, {
+        name,
+        discount,
+        categoryId: selectedCategoryId
+      }, { withCredentials: true })
+
       setSuccess("Partner created successfully")
       setName("")
       setDiscount("")
-      setCategoryId("")
-      fetchData()
+      fetchCategories()
+      setCreateLoading(false)
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to create partner")
+      setCreateLoading(false)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this partner?")) return
+  const handleDeletePartner = async (partnerId: string) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+      background: "#121212",
+      color: "#fff",
+      confirmButtonColor: "#F80B58",
+      cancelButtonColor: "#888"
+    })
+
+    if (!result.isConfirmed) return
 
     try {
-      await axios.delete(`http://localhost:3000/partner/${id}`, {
-        withCredentials: true,
-      })
+      await axios.delete(`${BASE_URL}/partners/${partnerId}`, { withCredentials: true })
       setSuccess("Partner deleted successfully")
-      fetchData()
+      fetchCategories()
+      Swal.fire({
+        title: "Deleted!",
+        text: "Partner has been deleted.",
+        icon: "success",
+        background: "#121212",
+        color: "#fff",
+        confirmButtonColor: "#F80B58",
+      })
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to delete partner")
     }
   }
 
+  const selectedCategory = categories.find(c => c.id === selectedCategoryId)
+
   return (
     <div className="space-y-6">
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Create Partner</h2>
-        {error && <div className="mb-4 p-3 bg-red-50 text-red-500 rounded text-sm">{error}</div>}
-        {success && <div className="mb-4 p-3 bg-green-50 text-green-500 rounded text-sm">{success}</div>}
+      {/* Create Partner */}
+      <div className="bg-[#1a1a1a] shadow-md rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Create Partner</h2>
+        {error && <div className="mb-4 p-3 bg-[#F80B58]/20 text-[#F80B58] rounded text-sm">{error}</div>}
+        {success && <div className="mb-4 p-3 bg-green-800 text-green-400 rounded text-sm">{success}</div>}
 
-        <form onSubmit={handleCreate} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Partner name"
-              required
-              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-            <input
-              type="text"
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              placeholder="Discount (e.g., 20%)"
-              required
-              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              required
-              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Create Partner
+        <form onSubmit={handleCreatePartner} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Partner name"
+            required
+            className="px-3 py-2 bg-[#121212] border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#F80B58]"
+          />
+          <input
+            type="text"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
+            placeholder="Discount"
+            required
+            className="px-3 py-2 bg-[#121212] border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#F80B58]"
+          />
+          <select
+            value={selectedCategoryId}
+            onChange={(e) => setSelectedCategoryId(e.target.value)}
+            required
+            className="px-3 py-2 bg-[#121212] border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#F80B58]"
+          >
+            <option value="">Select Category</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+          <button disabled={createLoading} className="col-span-full sm:col-auto px-6 py-2 bg-[#F80B58] rounded-md text-white hover:bg-[#F80B5899] transition-colors duration-200 cursor-pointer disabled:cursor-not-allowed">
+             {createLoading ? "Creating..." : "Create Partner"}
           </button>
         </form>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Partners</h2>
+      {/* Partners Table */}
+      <div className="bg-[#1a1a1a] shadow-md rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-700">
+          <h2 className="text-lg font-semibold text-white">Partners</h2>
         </div>
         {loading ? (
-          <div className="p-6">Loading...</div>
+          <div className="p-6 text-gray-300">Loading...</div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead className="bg-[#121212]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Discount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Discount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {partners.map((partner) => (
-                <tr key={partner.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{partner.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{partner.discount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{partner.category?.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => handleDelete(partner.id)} className="text-red-600 hover:text-red-900">
+            <tbody className="divide-y divide-gray-700">
+              {selectedCategory?.partners.map(partner => (
+                <tr key={partner.id} className="hover:bg-[#121212] transition-colors">
+                  <td className="px-6 py-4 text-sm text-white">{partner.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-400">{partner.discount}</td>
+                  <td className="px-6 py-4 text-sm text-gray-400">{selectedCategory.name}</td>
+                  <td className="px-6 py-4 text-right text-sm">
+                    <button
+                      onClick={() => handleDeletePartner(partner.id)}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                    >
                       Delete
                     </button>
                   </td>
                 </tr>
               ))}
+              {!selectedCategory?.partners.length && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-4 text-gray-400 text-center">
+                    {selectedCategoryId==="" ? "Please select a category to view partners" : "No partners found for this category."}  
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         )}
