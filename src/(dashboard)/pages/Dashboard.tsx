@@ -1,21 +1,38 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs"
 import { useAuth } from "../auth/AuthContext"
 import DCategories from "../components/Categories"
 import DPartners from "../components/Partners"
 import DRegistrations from "../components/Registrations"
 import DRedeems from "../components/Redeems"
+import axios from "axios"
+import { BASE_URL } from "@/lib/baseUrl"
 
 export default function Dashboard() {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState("categories")
 
-  const handleLogout = () => {
-    logout()
-  }
+  useEffect(() => {
+    const storedTab = localStorage.getItem("dashboardActiveTab")
+    if (storedTab) setActiveTab(storedTab)
+  }, [])
 
+const handleLogout = async () => {
+  try {
+    await axios.post(`${BASE_URL}/auth/logout`, {}, { withCredentials: true })
+    localStorage.removeItem("user") 
+    window.location.href = "/dashboard/login"
+  } catch (error) {
+    console.error("Logout failed", error)
+  }
+}
+
+const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    localStorage.setItem("dashboardActiveTab", value)
+  }
   return (
     <div className=" bg-[#121212] min-h-[100vh] text-white">
       {/* Navbar */}
@@ -27,7 +44,7 @@ export default function Dashboard() {
               <span className="text-sm text-gray-300">{user?.email}</span>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-[#F80B58] rounded-md hover:bg-[#F80B5899] transition-colors duration-200"
+                className="px-4 py-2 text-sm font-medium text-white bg-[#F80B58] rounded-md hover:bg-[#F80B5899] transition-colors duration-200 cursor-pointer"
               >
                 Logout
               </button>
@@ -38,7 +55,7 @@ export default function Dashboard() {
 
       {/* Tabs */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab}  onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="flex border-b border-gray-700 ">
             {[
               { value: "categories", label: "Categories" },

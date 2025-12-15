@@ -1,8 +1,8 @@
-
-
 import { useState, useEffect } from "react"
 import axios from "axios"
 import DSkeletonTable from "./SkeletonTable"
+import Pagination from "./PaginationProps" 
+import { BASE_URL } from "@/lib/baseUrl"
 
 interface Redeem {
   id: string
@@ -43,7 +43,7 @@ export default function DRedeems() {
   const fetchRedeems = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`http://localhost:3000/redeem?page=${page}&limit=${limit}`, {
+      const response = await axios.get(`${BASE_URL}/redeem?page=${page}&limit=${limit}`, {
         withCredentials: true,
       })
       setPaginationData(response.data)
@@ -98,65 +98,14 @@ export default function DRedeems() {
             </table>
           </div>
 
-          {/* Pagination */}
-          <div className="px-4 py-3 flex items-center justify-between border-t border-gray-700 sm:px-6">
-            <div className="flex-1 flex justify-between sm:hidden">
-              <button
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-                className="px-4 py-2 rounded-md text-sm font-medium bg-[#121212] text-gray-300 hover:bg-[#222] disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setPage(page + 1)}
-                disabled={page === paginationData?.totalPages}
-                className="px-4 py-2 rounded-md text-sm font-medium bg-[#121212] text-gray-300 hover:bg-[#222] disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-400">
-                  Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{" "}
-                  <span className="font-medium">{Math.min(page * limit, paginationData?.total || 0)}</span> of{" "}
-                  <span className="font-medium">{paginationData?.total}</span> results
-                </p>
-              </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                  <button
-                    onClick={() => setPage(page - 1)}
-                    disabled={page === 1}
-                    className="px-2 py-2 rounded-l-md bg-[#121212] text-gray-400 hover:bg-[#222] disabled:opacity-50"
-                  >
-                    Previous
-                  </button>
-                  {Array.from({ length: paginationData?.totalPages || 0 }, (_, i) => i + 1).map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={`px-4 py-2 border text-sm font-medium ${
-                        pageNum === page
-                          ? "z-10 bg-[#F80B58] border-[#F80B58] text-white"
-                          : "bg-[#121212] border-gray-700 text-gray-400 hover:bg-[#222]"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setPage(page + 1)}
-                    disabled={page === paginationData?.totalPages}
-                    className="px-2 py-2 rounded-r-md bg-[#121212] text-gray-400 hover:bg-[#222] disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
+          {/* External Pagination Component */}
+          <Pagination
+            page={page}
+            totalPages={paginationData?.totalPages || 0}
+            totalItems={paginationData?.total || 0}
+            onPageChange={(p) => setPage(p)}
+            limit={limit}
+          />
         </>
       )}
     </div>
